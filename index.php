@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <link rel="icon"  href="img/Poto fitri.png">
+    <link rel="icon"  href="img/icon dr.png">
     <title>PT. BLACK SKY</title>
     <style type="text/css">
         
@@ -13,7 +13,7 @@
         }
 
         body{
-            background-image: url(img/bg.jpg);
+            background-image: url(img/dr.jpg);
         }
         a:hover{
             color: white;
