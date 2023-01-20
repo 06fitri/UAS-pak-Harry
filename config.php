@@ -1,4 +1,4 @@
-<!-- Reprogramed By Eri Yulian Hidayat -->
+<!-- Reprogramed By Fitri Lestari -->
 <?php
 	$conn = new mysqli("localhost","root","","cart_system");
 	if($conn->connect_error){
