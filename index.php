@@ -1,96 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <link rel="icon"  href="img/icon dr.png">
-    <title>PT. BLACK SKY</title>
-    <style type="text/css">
-        
-        a{
-            text-decoration: none;
-            font-size: 25px;
-            color:green;
-        }
-
-        body{
-            background-image: url(img/dr.jpg);
-        }
-        a:hover{
-            color: white;
-        }
-        table{
-            color: white;
-            background-color: rgb(112,130,56);
-            text-align: center;
-        }
-
-        table:hover{
-            color: white;
-        }
-h1{
-    text-align: center;
-    font-style: italic;
-    font-family: serif;
+<?php 
+function char_to_dec($a){
+    $i=ord($a);
+    if ($i>=97 && $i<=122){
+        return ($i-96);
+    } else if ($i>=65 && $i<=90){
+        return ($i-38);
+    } else {
+        return null;
+    }
 }
-.nav{
-    background-color:black;
+ 
+function dec_to_char($a){
+    if ($a>=1 && $a<=26){
+        return (chr($a+96));
+    } else if ($a>=27 && $a<=52){
+        return (chr($a+38));
+    } else {
+        return null;
+    }
+}
+ 
+function tabel_vigenere_encrypt($a, $b){
+    $i=$a+$b-1;
+    if ($i>26){
+        $i=$i-26;
+    }
+    return (dec_to_char($i));
 }
 
-img{
-    border-radius: 100px;
-}
+			$key="SHOLATLAH";
+            $plantext="FITRILESTARI";
+            $len_key=strlen($key);
+            $len_de=strlen($plantext);
+            $split_key=str_split($key);
+            $split_de=str_split($plantext);
+            $i=0;
+            echo "Mengunakan metode  Base64, str_rot13, dan Vigenere.  <hr><br>"."1.=> Mengunakan Metode Vigenere dengan key 'SHOLATLAH' <br>Plaintext => ".$plantext." <br> Chipertext => ";
+            for($j=0;$j<$len_de;$j++){
+                if ($i==$len_key){
+                    $i=0;
+                }
+                $split_key2[$j]=$split_key[$i];
+                $i++;
+            }
+            for($k=0;$k<$len_de;$k++){
+                $a=char_to_dec($split_key2[$k]);
+                $b=char_to_dec($split_de[$k]);
+                if (($a && $b)!=null){
+                    echo (tabel_vigenere_encrypt($a, $b));
+                } else {
+                    echo $split_de[$k];
+                }
+            }
 
-.brand{
-    border-radius: 100px;
-    width: 200px;
-    height: 200px;
-}
+            $en64= base64_encode($plantext);
+            $enst=str_rot13($plantext);
+            echo "<hr><br> 2.=> Mengunakan Metode Base64 <br> Plaintext => ".$plantext." <br> Chipertext => ".$en64."<br> <hr>3.=> Mengunakan Metode str_rot13 <br> Plaintext => ".$plantext." <br> Chipertext => ".$enst;
 
-
-    </style>
-  </head>
-  <body>
-    <h1>Welcome To Our Website <br>
-      <marquee> <b style="color:blue"> PT. BLACK SKY</b></marquee>
-    </h1>
-    <hr>
-    <div class="nav">
-    <a href="index.php">HOME</a> |
-    <a href="index.php?page=<?= base64_encode(base64_encode('page1')); ?>">ABOUT</a> |
-    <a href="index.php?page=<?= base64_encode(base64_encode('page2')); ?>">CONTACK</a> |
-    <a href="index.php?page=<?= base64_encode(base64_encode('page3')); ?>">HISTORY</a> |
-    <a href="index.php?page=<?= base64_encode(base64_encode('page4')); ?>">LOCATION</a> |
-    <hr>
-    </div>
-    <?php 
-    
-    if (isset($_GET['page'])) :  
-        $page= base64_decode(base64_decode(filter_var($_GET['page'],FILTER_SANITIZE_URL)));
-        $a= include "halaman/".$page.".php";
-        if ($a==false):
-          header('location:index.php');
-        endif;
-        ?>
- <?php else: ?>
-      <center><img src="img/brand.png" class="brand"><br> <table border="1px" width="70%" cellpadding="5" cellspacing="0">
-    <tr>
-        <td>NAMA       : FITRI LESTARI</td>
-    </tr>
-    <tr><td>JABATAN    : DIREKTUR UTAMA</td></tr>
-        <tr><td>ALAMAT : BENGKULU</td></tr>
-        <tr><td>E-MAIL : fitrilestariumb@gmail.com</td></tr>
-        <tr><td>NO HP : 081272628614</td></tr>
-    <tr>
-        <td style="background-color:silver; color: black" > DIREKTUR UTAMA PT. BLACK SKY <br><img src="img/dr.jpg" width="400px" height="400px"></td></tr>
-
-        
-</table>
-
-</center>
-
-<?php endif; ?>
-    
-  </body>
-</html>
-
-<!--php://filter/convert.base64-encode/resource= ->
+ 
+ ?>
