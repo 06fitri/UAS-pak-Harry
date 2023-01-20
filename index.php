@@ -29,7 +29,8 @@ function tabel_vigenere_encrypt($a, $b){
 }
 
 			$key="SHOLATLAH";
-            $plantext="ERIYULIANHIDAYAT";
+            $plantext="FITRI LESTARI
+";
             $len_key=strlen($key);
             $len_de=strlen($plantext);
             $split_key=str_split($key);
