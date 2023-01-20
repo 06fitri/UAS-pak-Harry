@@ -1,62 +1,153 @@
+<!-- Reprogramed By Eri Yulian Hidayat -->
 <?php 
-function char_to_dec($a){
-    $i=ord($a);
-    if ($i>=97 && $i<=122){
-        return ($i-96);
-    } else if ($i>=65 && $i<=90){
-        return ($i-38);
-    } else {
-        return null;
-    }
+include 'action.php';
+if (!isset($_SESSION["login"])) {
+echo "<script>
+        document.location.href='login.php';
+        </script>";
 }
- 
-function dec_to_char($a){
-    if ($a>=1 && $a<=26){
-        return (chr($a+96));
-    } else if ($a>=27 && $a<=52){
-        return (chr($a+38));
-    } else {
-        return null;
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="author" content="Sahil Kumar">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Shopping Cart System</title>
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css' />
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css' />
+</head>
+
+<body>
+  <!-- Navbar start -->
+  <nav class="navbar navbar-expand-md bg-dark navbar-dark">
+    <a class="navbar-brand" href="index.php"><i class="fas fa-mobile-alt"></i>&nbsp;&nbsp;Mobile Store</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link active" href="index.php"><i class="fas fa-mobile-alt mr-2"></i>Products</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#"><i class="fas fa-th-list mr-2"></i>Categories</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="checkout.php"><i class="fas fa-money-check-alt mr-2"></i>Checkout</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="cart.php"><i class="fas fa-shopping-cart"></i> <span id="cart-item" class="badge badge-danger"></span></a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <!-- Navbar end -->
+
+  <!-- Displaying Products Start -->
+  <div class="container">
+    <div id="message"></div>
+    <div class="row mt-2 pb-3">
+      <?php
+  			include 'config.php';
+  			$stmt = $conn->prepare('SELECT * FROM product');
+  			$stmt->execute();
+  			$result = $stmt->get_result();
+  			while ($row = $result->fetch_assoc()):
+  		?>
+      <div class="col-sm-6 col-md-4 col-lg-3 mb-2">
+        <div class="card-deck">
+          <div class="card p-2 border-secondary mb-2">
+            <img src="<?= $row['product_image'] ?>" class="card-img-top" height="250">
+            <div class="card-body p-1">
+              <h4 class="card-title text-center text-info"><?= $row['product_name'] ?></h4>
+              <h5 class="card-text text-center text-danger">&nbsp;&nbsp;<?= "Rp. ".number_format($row['product_price'],2) ?></h5>
+
+            </div>
+            <div class="card-footer p-1">
+              <form action="" class="form-submit">
+                <div class="row p-2">
+                  <div class="col-md-6 py-1 pl-4">
+                    <b>Quantity : </b>
+                  </div>
+                  <div class="col-md-6">
+                    <input type="number" class="form-control pqty" value="<?= $row['product_qty'] ?>">
+                  </div>
+                </div>
+                <input type="hidden" class="pid" value="<?= $row['id'] ?>">
+                <input type="hidden" class="pname" value="<?= $row['product_name'] ?>">
+                <input type="hidden" class="pprice" value="<?= $row['product_price'] ?>">
+                <input type="hidden" class="pimage" value="<?= $row['product_image'] ?>">
+                <input type="hidden" class="pcode" value="<?= $row['product_code'] ?>">
+                <button class="btn btn-info btn-block addItemBtn"><i class="fas fa-cart-plus"></i>&nbsp;&nbsp;Add to
+                  cart</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <?php endwhile; ?>
+    </div>
+  </div>
+  <!-- Displaying Products End -->
+
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/js/bootstrap.min.js'></script>
+
+  <script type="text/javascript">
+  $(document).ready(function() {
+
+    // Send product details in the server
+    $(".addItemBtn").click(function(e) {
+      e.preventDefault();
+      var $form = $(this).closest(".form-submit");
+      var pid = $form.find(".pid").val();
+      var pname = $form.find(".pname").val();
+      var pprice = $form.find(".pprice").val();
+      var pimage = $form.find(".pimage").val();
+      var pcode = $form.find(".pcode").val();
+
+      var pqty = $form.find(".pqty").val();
+
+      $.ajax({
+        url: 'action.php',
+        method: 'post',
+        data: {
+          pid: pid,
+          pname: pname,
+          pprice: pprice,
+          pqty: pqty,
+          pimage: pimage,
+          pcode: pcode
+        },
+        success: function(response) {
+          $("#message").html(response);
+          window.scrollTo(0, 0);
+          load_cart_item_number();
+        }
+      });
+    });
+
+    // Load total no.of items added in the cart and display in the navbar
+    load_cart_item_number();
+
+    function load_cart_item_number() {
+      $.ajax({
+        url: 'action.php',
+        method: 'get',
+        data: {
+          cartItem: "cart_item"
+        },
+        success: function(response) {
+          $("#cart-item").html(response);
+        }
+      });
     }
-}
- 
-function tabel_vigenere_encrypt($a, $b){
-    $i=$a+$b-1;
-    if ($i>26){
-        $i=$i-26;
-    }
-    return (dec_to_char($i));
-}
+  });
+  </script>
+</body>
 
-			$key="SHOLATLAH";
-            $plantext="FITRI LESTARI
-";
-            $len_key=strlen($key);
-            $len_de=strlen($plantext);
-            $split_key=str_split($key);
-            $split_de=str_split($plantext);
-            $i=0;
-            echo "Mengunakan metode  Base64, str_rot13, dan Vigenere.  <hr><br>"."1.=> Mengunakan Metode Vigenere dengan key 'SHOLATLAH' <br>Plaintext => ".$plantext." <br> Chipertext => ";
-            for($j=0;$j<$len_de;$j++){
-                if ($i==$len_key){
-                    $i=0;
-                }
-                $split_key2[$j]=$split_key[$i];
-                $i++;
-            }
-            for($k=0;$k<$len_de;$k++){
-                $a=char_to_dec($split_key2[$k]);
-                $b=char_to_dec($split_de[$k]);
-                if (($a && $b)!=null){
-                    echo (tabel_vigenere_encrypt($a, $b));
-                } else {
-                    echo $split_de[$k];
-                }
-            }
-
-            $en64= base64_encode($plantext);
-            $enst=str_rot13($plantext);
-            echo "<hr><br> 2.=> Mengunakan Metode Base64 <br> Plaintext => ".$plantext." <br> Chipertext => ".$en64."<br> <hr>3.=> Mengunakan Metode str_rot13 <br> Plaintext => ".$plantext." <br> Chipertext => ".$enst;
-
- 
- ?>
+</html>
+<!-- Reprogramed By Fitri lestari -->
